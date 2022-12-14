@@ -11,7 +11,4 @@ terraform {
 provider "aws" {
     region = "eu-west-1"
     profile = "SolutionArchitect"
-    # default_tags {
-    #   tags = var.tags
-    # }
 }

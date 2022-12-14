@@ -5,7 +5,7 @@ variable "site_domain" {
 
 variable "site_name" {
   type        = string
-  description = "The unique name for this instance of the module. Required to deploy multiple wordpress instances to the same AWS account (if desired)."
+  description = "The unique name for this instance of the module. Required to deploy multiple ghost instances to the same AWS account (if desired)."
   validation {
     # regex(...) fails if it cannot find a match
     condition     = can(regex("^[0-9A-Za-z]+$", var.site_name))
@@ -14,7 +14,7 @@ variable "site_name" {
 }
 variable "s3_region" {
   type        = string
-  description = "The regional endpoint to use for the creation of the S3 bucket for published static wordpress site."
+  description = "The regional endpoint to use for the creation of the S3 bucket for published static ghost site."
 }
 
 

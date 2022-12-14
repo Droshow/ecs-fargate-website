@@ -12,7 +12,6 @@ resource "aws_cloudwatch_log_group" "object_redirect" {
 resource "aws_cloudwatch_log_group" "object_redirect_ue1" {
   name              = "/aws/lambda/us-east-1.${var.site_name}_redirect_index_html"
   retention_in_days = 7
-  provider          = aws.ue1
 }
 
 resource "aws_lambda_function" "object_redirect" {

@@ -85,12 +85,9 @@ module "cloudfront" {
   source             = "./modules/cloudfront"
   site_name          = var.site_name
   site_domain        = var.site_domain
-  cloudfront_ssl     = aws_acm_certificate.wordpress_site.arn
+  cloudfront_ssl     = aws_acm_certificate.ghost_site.arn
   cloudfront_aliases = var.cloudfront_aliases
-  providers = {
-    aws.ue1 = aws.ue1
-  }
-  depends_on = [aws_acm_certificate_validation.wordpress_site,
+  depends_on = [aws_acm_certificate_validation.ghost_site,
   module.waf]
   cloudfront_class = var.cloudfront_class
   waf_acl_arn      = var.waf_enabled ? module.waf[0].waf_acl_arn : null

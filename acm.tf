@@ -7,7 +7,7 @@ resource "aws_acm_certificate" "acm_site" {
   lifecycle {
     create_before_destroy = true
   }
-  provider = aws.ue1
+
 }
 
 resource "aws_route53_record" "ghost_acm_validation" {
