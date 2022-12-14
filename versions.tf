@@ -7,7 +7,6 @@ terraform {
   }
 
   required_version = ">= 0.13.1"
-  
 }
 provider "aws" {
     region = "eu-west-1"
@@ -15,4 +14,4 @@ provider "aws" {
     # default_tags {
     #   tags = var.tags
     # }
-} 
+}
