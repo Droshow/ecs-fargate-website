@@ -1,6 +1,4 @@
-# TODO: Add optional logging for S3 bucket
-# TODO: Add optional versioning for S3 bucket
-#tfsec:ignore:AWS002 #tfsec:ignore:AWS077
+
 resource "aws_s3_bucket" "ghost_bucket" {
   bucket        = "${var.site_prefix}.${var.site_domain}"
   force_destroy = true

@@ -1,3 +1,8 @@
+The purpose of this website is to once the updates are made in Ghost CMS - is to run it through S3 and Cloudfront for a static delivery.
+
+
+
+
 <!-- BEGIN_TF_DOCS -->
 # cloudfront
 

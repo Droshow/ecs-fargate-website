@@ -12,13 +12,11 @@ variable "site_name" {
     error_message = "For site_name value only a-z, A-Z and 0-9 are allowed."
   }
 }
+
 variable "s3_region" {
   type        = string
   description = "The regional endpoint to use for the creation of the S3 bucket for published static ghost site."
 }
-
-
-
 
 ############################
 # Cluster ECS
@@ -44,6 +42,18 @@ variable "cluster_settings" {
     value = "enabled"
   }
 }
+variable "ecs_cpu" {
+  type        = number
+  description = "The CPU limit password to the ghost container definition."
+  default     = 256
+}
+
+variable "ecs_memory" {
+  type        = number
+  default     = 512
+  description = "The memory limit password to the ghost container definition."
+}
+
 
 ############################
 # Capacity Providers ECS
@@ -82,7 +92,33 @@ variable "hosted_zone_id" {
   description = "The Route53 HostedZone ID to use to create records in."
 }
 
-variable "waf_enabled" {
-  type        = bool
-  description = "Flag to enable default WAF configuration in front of CloudFront."
+# variable "waf_enabled" {
+#   type        = bool
+#   description = "Flag to enable default WAF configuration in front of CloudFront."
+# }
+
+variable "ghost_subdomain" {
+  type        = string
+  description = "The subdomain used for the ghost container."
+  default     = "ghost"
+}
+
+variable "ghost_admin_user" {
+  type        = string
+  description = "The username of the default ghost admin user."
+  default     = "supervisor"
+}
+
+variable "ghost_admin_password" {
+  type        = string
+  description = "The password of the default ghost admin user."
+  #tfsec:ignore:GEN001
+  default   = "techtospeech.com"
+  sensitive = true
+}
+
+variable "ghost_admin_email" {
+  type        = string
+  description = "The email address of the default ghost admin user."
+  default     = "admin@example.com"
 }
