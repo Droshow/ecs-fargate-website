@@ -13,5 +13,5 @@ provider "aws" {
   # access_key = var.aws-access-key
   # secret_key = var.aws-secret-key
   region     = "eu-central-1"
-  version    = "~> 2.0"
+  profile = "SolutionArchitect"
 }
