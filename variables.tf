@@ -7,7 +7,7 @@ variable "container_image" {
   default = "ghost"
 }
 variable "cluster_name" {
-  default = "ghost_cluster"
+  default = "ghost"
 }
 variable "capacity_provider" {
   default = "FARGATE"

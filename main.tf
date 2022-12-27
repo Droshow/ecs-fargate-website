@@ -37,12 +37,12 @@ module "vpc" {
   name = local.project_tag.Project
   cidr = "10.0.0.0/16"
 
-  azs             = ["eu-west-1a", "eu-west-1b",]
+  azs             = ["eu-central-1a", "eu-central-1b",]
   private_subnets = ["10.0.1.0/24", "10.0.2.0/24",]
   public_subnets  = ["10.0.101.0/24", "10.0.102.0/24",]
 
   enable_nat_gateway = true
-  enable_vpn_gateway = true
+  enable_vpn_gateway = false
 
   tags = {
     Terraform = "true"
@@ -53,6 +53,8 @@ module "vpc" {
 #############
 #ECS
 #############
+#### ECS tasks should be in private subnets, but does it work with autoscaling then?
+
 module "ecs" {
   source                                    = "./modules/ecs"
   cluster_count                             = 1
@@ -85,7 +87,7 @@ module "loadbalancer" {
   lb_type                    = var.lb_type
   vpc_id                     = module.vpc.vpc_id
   lb_sg                      = module.security.fargate_sg
-  subnets                    = module.vpc.private_subnets
+  subnets                    = module.vpc.public_subnets
   default_sg                 = module.security.fargate_sg_default
   lb_listener_port           = 80
   lb_listener_portocol       = "HTTP"
