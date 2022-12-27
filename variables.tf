@@ -4,7 +4,7 @@ variable "container_name" {
   default = "ghost_image"
 }
 variable "container_image" {
-  default = "114148051138.dkr.ecr.us-east-1.amazonaws.com/docker:latest"
+  default = "ghost"
 }
 variable "cluster_name" {
   default = "ghost_cluster"
