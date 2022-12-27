@@ -1,124 +1,57 @@
-variable "site_domain" {
-  type        = string
-  description = "The site domain name to configure (without any subdomains such as 'www')"
+# ---- root/main
+
+variable "container_name" {
+  default = "ghost_image"
 }
-
-variable "site_name" {
-  type        = string
-  description = "The unique name for this instance of the module. Required to deploy multiple ghost instances to the same AWS account (if desired)."
-  validation {
-    # regex(...) fails if it cannot find a match
-    condition     = can(regex("^[0-9A-Za-z]+$", var.site_name))
-    error_message = "For site_name value only a-z, A-Z and 0-9 are allowed."
-  }
+variable "container_image" {
+  default = "114148051138.dkr.ecr.us-east-1.amazonaws.com/docker:latest"
 }
-
-variable "s3_region" {
-  type        = string
-  description = "The regional endpoint to use for the creation of the S3 bucket for published static ghost site."
-}
-
-############################
-# Cluster ECS
-############################
-
 variable "cluster_name" {
-  description = "Name of the cluster (up to 255 letters, numbers, hyphens, and underscores)"
-  type        = string
-  default     = ""
+  default = "ghost_cluster"
+}
+variable "capacity_provider" {
+  default = "FARGATE"
+}
+variable "family" {
+  default = "ghost"
+}
+variable "network_mode" {
+  default = "awsvpc"
 }
 
-variable "cluster_configuration" {
-  description = "The execute command configuration for the cluster"
-  type        = any
-  default     = {}
+variable "vpc_cidr" {
+  default = "10.0.0.0/16"
 }
-
-variable "cluster_settings" {
-  description = "Configuration block(s) with cluster settings. For example, this can be used to enable CloudWatch Container Insights for a cluster"
-  type        = map(string)
-  default = {
-    name  = "containerInsights"
-    value = "enabled"
-  }
+variable "lb_name" {
+  default = "fargate"
 }
-variable "ecs_cpu" {
-  type        = number
-  description = "The CPU limit password to the ghost container definition."
-  default     = 256
+variable "lb_type" {
+  default = "application"
 }
-
-variable "ecs_memory" {
-  type        = number
-  default     = 512
-  description = "The memory limit password to the ghost container definition."
+variable "iam_policy_description" {
+  default = "Policy for container to pull from ECR"
 }
-
-
-############################
-# Capacity Providers ECS
-############################
-
-variable "default_capacity_provider_use_fargate" {
-  description = "Determines whether to use Fargate or autoscaling for default capacity provider strategy"
-  type        = bool
-  default     = true
+variable "policy_type" {
+  default = "TargetTrackingScaling"
 }
-
-variable "fargate_capacity_providers" {
-  description = "Map of Fargate capacity provider definitions to use for the cluster"
-  type        = any
-  default     = {}
+variable "asg_name" {
+  default = "fargate"
 }
-
-############################
-# CloudFront
-############################
-
-variable "cloudfront_aliases" {
-  type        = list(any)
-  description = "The domain and sub-domain aliases to use for the cloudfront distribution."
-  default     = []
+variable "scalable_dimension" {
+  default = "ecs:service:DesiredCount"
 }
-
-variable "cloudfront_class" {
-  type        = string
-  description = "The [price class](https://aws.amazon.com/cloudfront/pricing/) for the distribution. One of: PriceClass_All, PriceClass_200, PriceClass_100"
-  default     = "PriceClass_All"
+variable "service_namespace" {
+  default = "ecs"
 }
-
-variable "hosted_zone_id" {
-  type        = string
-  description = "The Route53 HostedZone ID to use to create records in."
+variable "iam_role_name" {
+  default = "fargate_role"
 }
-
-# variable "waf_enabled" {
-#   type        = bool
-#   description = "Flag to enable default WAF configuration in front of CloudFront."
-# }
-
-variable "ghost_subdomain" {
-  type        = string
-  description = "The subdomain used for the ghost container."
-  default     = "ghost"
+variable "policy_name" {
+  default = "Fargate-ECR-Policy"
 }
-
-variable "ghost_admin_user" {
-  type        = string
-  description = "The username of the default ghost admin user."
-  default     = "supervisor"
+variable "predefined_metric_type" {
+  default = "ECSServiceAverageCPUUtilization"
 }
-
-variable "ghost_admin_password" {
-  type        = string
-  description = "The password of the default ghost admin user."
-  #tfsec:ignore:GEN001
-  default   = "techtospeech.com"
-  sensitive = true
-}
-
-variable "ghost_admin_email" {
-  type        = string
-  description = "The email address of the default ghost admin user."
-  default     = "admin@example.com"
+variable "waf_name" {
+  default = "waf-fargate"
 }
