@@ -4,7 +4,7 @@ variable "container_name" {
   default = "ghost_image"
 }
 variable "container_image" {
-  default = "ghost"
+  default = "961477247679.dkr.ecr.eu-central-1.amazonaws.com/digidocs:development"
 }
 variable "cluster_name" {
   default = "ghost"
