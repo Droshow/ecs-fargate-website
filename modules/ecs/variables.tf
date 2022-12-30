@@ -7,7 +7,6 @@ variable "family" {}
 variable "network_mode" {}
 variable "execution_role_arn" {}
 variable "task_role_arn" {}
-variable "the_vpc_id" {}
 variable "subnets" {}
 variable "lb_target_group_arn" {}
 variable "cpu" {}

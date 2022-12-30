@@ -63,7 +63,7 @@ resource "aws_ecs_task_definition" "os_system" {
       transit_encryption      = "ENABLED"
       transit_encryption_port = 2999
       authorization_config {
-        access_point_id = aws_efs_access_point.ghost_persistent.id
+        access_point_id = aws_efs_access_point.ghost_efs.id
         iam             = "ENABLED"
       }
     }

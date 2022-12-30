@@ -24,6 +24,7 @@ locals {
 module "security" {
   source = "./modules/security"
   vpc_id = module.vpc.vpc_id
+  site_name = var.site_name
 
 }
 
@@ -58,6 +59,7 @@ module "vpc" {
 module "ecs" {
   source                                    = "./modules/ecs"
   cluster_count                             = 1
+  site_name                                 = var.site_name
   cluster_name                              = var.cluster_name
   capacity_provider                         = var.capacity_provider
   container_name                            = var.container_name
