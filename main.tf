@@ -72,8 +72,8 @@ module "ecs" {
   lb_target_group_arn                       = module.loadbalancer.lb_target_group_arn
   cpu                                       = 256
   memory                                    = 512
-  container_port                            = 80
-  host_port                                 = 80
+  container_port                            = 2368
+  host_port                                 = 2368
   assign_public_ip                          = true
   default_capacity_provider_strategy_base   = 1
   default_capacity_provider_strategy_weight = 100
