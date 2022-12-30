@@ -111,7 +111,7 @@ resource "aws_efs_access_point" "ghost_efs" {
 }
 
 resource "aws_efs_mount_target" "ghost_efs" {
+  for_each        = toset(var.subnets)
   file_system_id  = aws_efs_file_system.ghost_persistent.id
-  subnet_id = var.subnets
-  security_groups = [aws_security_group.efs_security_group.id]
+  subnet_id= each.value
 }
