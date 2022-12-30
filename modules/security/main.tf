@@ -42,3 +42,18 @@ resource "aws_default_security_group" "fargate_default" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_security_group" "efs_security_group" {
+  name        = "${var.site_name}_efs_sg"
+  description = "security group for efs for ghost"
+  vpc_id      = var.vpc_id
+}
+resource "aws_security_group_rule" "efs_ingress" {
+  security_group_id        = aws_security_group.efs_security_group.id
+  type                     = "ingress"
+  from_port                = 2049
+  to_port                  = 2049
+  protocol                 = "TCP"
+  source_security_group_id = aws_security_group.fargate.id
+  description              = "Ingress to EFS mount from Wordpress container"
+}

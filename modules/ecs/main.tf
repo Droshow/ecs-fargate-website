@@ -36,6 +36,7 @@ resource "aws_ecs_task_definition" "os_system" {
       cpu       = var.cpu
       memory    = var.memory
       essential = var.container_definitions_essential
+      efs_source_volume        = "Ghost-persistent"
       logConfiguration : {
         logDriver = "awslogs",
         options = {
@@ -44,6 +45,7 @@ resource "aws_ecs_task_definition" "os_system" {
           awslogs-region        = "eu-central-1",
           awslogs-stream-prefix = "ecs"
       } }
+
       portMappings = [
         {
           containerPort = var.container_port
@@ -52,6 +54,23 @@ resource "aws_ecs_task_definition" "os_system" {
       ]
     },
   ])
+  volume {
+    name = "persistent-storage"
+
+    efs_volume_configuration {
+      file_system_id          = aws_efs_file_system.ghost_persistent.id
+      root_directory          = "/opt/data"
+      transit_encryption      = "ENABLED"
+      transit_encryption_port = 2999
+      authorization_config {
+        access_point_id = aws_efs_access_point.ghost_persistent.id
+        iam             = "ENABLED"
+      }
+    }
+        }
+  depends_on = [
+    aws_efs_file_system.ghost_persistent
+  ]
 }
 resource "aws_ecs_service" "os_system" {
   name            = var.cluster_name
@@ -63,8 +82,6 @@ resource "aws_ecs_service" "os_system" {
     container_name   = var.container_name
     container_port   = var.container_port
   }
-
-
   capacity_provider_strategy {
     capacity_provider = var.capacity_provider
     weight            = 1
@@ -74,4 +91,27 @@ resource "aws_ecs_service" "os_system" {
     subnets          = var.subnets
     assign_public_ip = var.assign_public_ip
   }
+}
+
+#########
+#EFS
+#########
+resource "aws_efs_file_system" "ghost_persistent" {
+  encrypted = true
+  lifecycle_policy {
+    transition_to_ia = "AFTER_7_DAYS"
+  }
+  tags = {
+    "Name" = "${var.site_name}_ghost_persistent"
+  }
+}
+
+resource "aws_efs_access_point" "ghost_efs" {
+  file_system_id = aws_efs_file_system.ghost_persistent.id
+}
+
+resource "aws_efs_mount_target" "ghost_efs" {
+  file_system_id  = aws_efs_file_system.ghost_persistent.id
+  subnet_id = var.subnets
+  security_groups = [aws_security_group.efs_security_group.id]
 }

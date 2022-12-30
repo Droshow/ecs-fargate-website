@@ -4,7 +4,7 @@ variable "container_name" {
   default = "ghost_image"
 }
 variable "container_image" {
-  default = "961477247679.dkr.ecr.eu-central-1.amazonaws.com/digidocs:development"
+  default = "961477247679.dkr.ecr.eu-central-1.amazonaws.com/digidocs:ghost-development"
 }
 variable "cluster_name" {
   default = "ghost"
@@ -52,6 +52,10 @@ variable "policy_name" {
 variable "predefined_metric_type" {
   default = "ECSServiceAverageCPUUtilization"
 }
-variable "waf_name" {
-  default = "waf-fargate"
+
+variable "site_name" {
+  default = "mojowa"
 }
+# variable "waf_name" {
+#   default = "waf-fargate"
+# }
