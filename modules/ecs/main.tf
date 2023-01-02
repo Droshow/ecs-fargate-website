@@ -59,9 +59,7 @@ resource "aws_ecs_task_definition" "os_system" {
 
     efs_volume_configuration {
       file_system_id          = aws_efs_file_system.ghost_persistent.id
-      root_directory          = "/opt/data"
       transit_encryption      = "ENABLED"
-      transit_encryption_port = 2999
       authorization_config {
         access_point_id = aws_efs_access_point.ghost_efs.id
         iam             = "ENABLED"
