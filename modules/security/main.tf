@@ -51,9 +51,9 @@ resource "aws_security_group" "efs_security_group" {
 resource "aws_security_group_rule" "efs_ingress" {
   security_group_id        = aws_security_group.efs_security_group.id
   type                     = "ingress"
-  from_port                = 2368
-  to_port                  = 2368
+  from_port                = 2049
+  to_port                  = 2049
   protocol                 = "TCP"
   source_security_group_id = aws_security_group.fargate.id
-  description              = "Ingress to EFS mount from Wordpress container"
+  description              = "Ingress to EFS mount from ghost container"
 }
