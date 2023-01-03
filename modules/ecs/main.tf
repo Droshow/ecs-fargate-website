@@ -36,7 +36,6 @@ resource "aws_ecs_task_definition" "os_system" {
       cpu       = var.cpu
       memory    = var.memory
       essential = var.container_definitions_essential
-      efs_source_volume        = "Ghost-persistent"
       logConfiguration : {
         logDriver = "awslogs",
         options = {

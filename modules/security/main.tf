@@ -3,7 +3,8 @@
 ####################
 
 resource "aws_security_group" "fargate_task" {
-  name        = "HTTP_Access"
+  #TODO add it to ecs programatically 
+  name        = "ECS_security_groupt"
   description = "security group for fargate"
   vpc_id      = var.vpc_id
 
