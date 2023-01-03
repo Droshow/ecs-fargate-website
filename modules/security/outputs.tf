@@ -1,4 +1,4 @@
-output "fargate_sg" {
+output "fargate_task" {
   value = aws_security_group.fargate_task.id
 }
 
