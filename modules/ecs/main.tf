@@ -50,7 +50,14 @@ resource "aws_ecs_task_definition" "os_system" {
           containerPort = var.container_port
           hostPort      = var.host_port
         }
+      ],
+      mountPoints =  [
+        {
+          sourceVolume = "${var.site_name}_ghost_persistent",
+          containerPath =  "/var/lib/ghost"
+        }
       ]
+
     },
   ])
   volume {
