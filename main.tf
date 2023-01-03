@@ -94,7 +94,7 @@ module "loadbalancer" {
   lb_listener_port           = 80
   lb_listener_portocol       = "HTTP"
   listener_action_type       = "forward"
-  target_group_port          = 2049
+  target_group_port          = 2386
   tg_protocol                = "HTTP"
   target_type                = "ip"
   enable_deletion_protection = false
