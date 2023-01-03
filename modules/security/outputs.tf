@@ -1,5 +1,5 @@
 output "fargate_sg" {
-  value = aws_security_group.fargate.id
+  value = aws_security_group.fargate_task.id
 }
 
 output "fargate_sg_default" {
