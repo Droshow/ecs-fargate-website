@@ -47,7 +47,7 @@ variable "iam_role_name" {
   default = "fargate_role"
 }
 variable "policy_name" {
-  default = "Fargate-ECR-Policy"
+  default = "Fargate-Policy"
 }
 variable "predefined_metric_type" {
   default = "ECSServiceAverageCPUUtilization"

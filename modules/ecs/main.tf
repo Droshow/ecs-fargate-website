@@ -55,7 +55,7 @@ resource "aws_ecs_task_definition" "os_system" {
     },
   ])
   volume {
-    name = "persistent-storage"
+    name = "${var.site_name}_ghost_persistent"
 
     efs_volume_configuration {
       file_system_id          = aws_efs_file_system.ghost_persistent.id

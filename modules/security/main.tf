@@ -4,7 +4,7 @@
 
 resource "aws_security_group" "fargate_task" {
   name        = "HTTP_Access"
-  description = "Allow HTTP/SSH inbound traffic"
+  description = "security group for fargate"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -25,7 +25,7 @@ resource "aws_security_group" "fargate_task" {
     from_port   = 2049
     to_port     = 2049
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    # cidr_blocks = ["0.0.0.0/0"]
     description = "Egress to EFS mount from ghost container"
   }
   egress {
