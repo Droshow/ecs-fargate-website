@@ -88,7 +88,7 @@ module "loadbalancer" {
   internal                   = false
   lb_type                    = var.lb_type
   vpc_id                     = module.vpc.vpc_id
-  lb_sg                      = module.security.fargate_sg
+  lb_sg                      = module.security.fargate_task
   subnets                    = module.vpc.public_subnets
   default_sg                 = module.security.fargate_sg_default
   lb_listener_port           = 80
