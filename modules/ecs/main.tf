@@ -54,7 +54,7 @@ resource "aws_ecs_task_definition" "os_system" {
       mountPoints =  [
         {
           sourceVolume = "${var.site_name}_ghost_persistent",
-          containerPath =  "/var/lib/ghost"
+          containerPath =  "/var/lib/ghost/content"
         }
       ]
 
