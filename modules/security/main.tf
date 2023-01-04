@@ -28,6 +28,7 @@ resource "aws_security_group" "fargate_task" {
     protocol    = "tcp"
     # cidr_blocks = ["0.0.0.0/0"]
     description = "Egress to EFS mount from ghost container"
+    security_groups = [aws_security_group.efs_security_group.id]
   }
   egress {
     from_port   = 80
