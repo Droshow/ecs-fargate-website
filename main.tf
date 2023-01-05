@@ -45,6 +45,9 @@ module "vpc" {
   enable_nat_gateway = true
   enable_vpn_gateway = false
 
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
   tags = {
     Terraform = "true"
     Environment = local.project_tag.Environment
@@ -78,6 +81,8 @@ module "ecs" {
   default_capacity_provider_strategy_base   = 1
   default_capacity_provider_strategy_weight = 100
   container_definitions_essential           = true
+  sg-container				    = module.security.fargate_task 
+  ecs_subnet_id				    = module.security.fargate_task 
 }
 #############
 #LOADBALANCER

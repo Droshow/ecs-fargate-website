@@ -19,7 +19,8 @@ variable "default_capacity_provider_strategy_base" {}
 variable "default_capacity_provider_strategy_weight" {}
 variable "container_definitions_essential" {}
 variable "site_name" {}
-
+variable "ecs_subnet_id" {}
+variable "sg-container" {}
 # variable "site_domain" {
 #   type        = string
 #   description = "The site domain name to configure (without any subdomains such as 'www')"

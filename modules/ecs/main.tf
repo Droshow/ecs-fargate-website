@@ -51,30 +51,34 @@ resource "aws_ecs_task_definition" "os_system" {
           hostPort      = var.host_port
         }
       ],
- #     mountPoints =  [
- #       {
- #         sourceVolume = "${var.site_name}_ghost_persistent",
- #         containerPath =  "/var/lib/ghost/content"
- #       }
- #     ]
+      mountPoints =  [
+        {
+          sourceVolume = "${var.site_name}_ghost_persistent",
+          containerPath =  "/var/lib/ghost/content"
+        }
+      #	
+      #  {
+      #    sourceVolume = "${var.site_name}_ghost_persistent",
+      #    containerPath =  "/var/lib/ghost/content"
+      #	}
+      #
+      ]
 
     },
   ])
- # volume {
- #   name = "${var.site_name}_ghost_persistent"
- #
- #   efs_volume_configuration {
- #     file_system_id          = aws_efs_file_system.ghost_persistent.id
- #     transit_encryption      = "ENABLED"
- #     authorization_config {
+  volume {
+    name = "${var.site_name}_ghost_persistent"
+  
+     efs_volume_configuration {
+      file_system_id          = aws_efs_file_system.ghost_persistent.id
+      root_directory          = ""
+      transit_encryption      = "DISABLED"
+    authorization_config {
  #       access_point_id = aws_efs_access_point.ghost_efs.id
- #       iam             = "ENABLED"
- #     }
- #   }
- #       }
- # depends_on = [
- #   aws_efs_file_system.ghost_persistent
- # ]
+       iam             = "DISABLED"
+      }
+    }
+        }
 }
 resource "aws_ecs_service" "os_system" {
   name            = var.cluster_name
@@ -93,29 +97,31 @@ resource "aws_ecs_service" "os_system" {
   }
   network_configuration {
     subnets          = var.subnets
-    assign_public_ip = var.assign_public_ip
+    #assign_public_ip = var.assign_public_ip
+    security_groups = [ var.sg-container ]
   }
 }
 
 #########
 #EFS
 #########
-#resource "aws_efs_file_system" "ghost_persistent" {
-#  encrypted = true
-#  lifecycle_policy {
-#    transition_to_ia = "AFTER_7_DAYS"
-#  }
-#  tags = {
-#    "Name" = "${var.site_name}_ghost_persistent"
-#  }
-#}
+resource "aws_efs_file_system" "ghost_persistent" {
+  encrypted = true
+  lifecycle_policy {
+    transition_to_ia = "AFTER_7_DAYS"
+  }
+  tags = {
+    "Name" = "${var.site_name}_ghost_persistent"
+  }
+}
 
-#resource "aws_efs_access_point" "ghost_efs" {
-#  file_system_id = aws_efs_file_system.ghost_persistent.id
-#}
+resource "aws_efs_access_point" "ghost_efs" {
+  file_system_id = aws_efs_file_system.ghost_persistent.id
+}
 
-#resource "aws_efs_mount_target" "ghost_efs" {
-#  for_each        = toset(var.subnets)
-#  file_system_id  = aws_efs_file_system.ghost_persistent.id
-#  subnet_id= each.value
-#}
+resource "aws_efs_mount_target" "ghost_efs" {
+  for_each        = toset(var.subnets)
+  file_system_id  = aws_efs_file_system.ghost_persistent.id
+  subnet_id = each.value
+  security_groups = [ var.ecs_subnet_id]
+}
