@@ -83,6 +83,8 @@ module "ecs" {
   container_definitions_essential           = true
   sg-container				    = module.security.fargate_task 
   ecs_subnet_id				    = module.security.fargate_task 
+
+  depends_on = [module.vpc]
 }
 #############
 #LOADBALANCER
