@@ -56,19 +56,13 @@ resource "aws_ecs_task_definition" "os_system" {
           sourceVolume = "${var.site_name}_ghost_persistent",
           containerPath =  "/var/lib/ghost/content"
         }
-      #	
-      #  {
-      #    sourceVolume = "${var.site_name}_ghost_persistent",
-      #    containerPath =  "/var/lib/ghost/content"
-      #	}
-      #
       ]
 
     },
   ])
   volume {
     name = "${var.site_name}_ghost_persistent"
-  
+
      efs_volume_configuration {
       file_system_id          = aws_efs_file_system.ghost_persistent.id
       root_directory          = ""

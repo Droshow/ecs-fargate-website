@@ -81,8 +81,8 @@ module "ecs" {
   default_capacity_provider_strategy_base   = 1
   default_capacity_provider_strategy_weight = 100
   container_definitions_essential           = true
-  sg-container				    = module.security.fargate_task 
-  ecs_subnet_id				    = module.security.fargate_task 
+  sg-container				    = module.security.fargate_task
+  ecs_subnet_id				    = module.security.fargate_task
 
   depends_on = [module.vpc]
 }
