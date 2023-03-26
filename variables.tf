@@ -56,6 +56,10 @@ variable "predefined_metric_type" {
 variable "site_name" {
   default = "mojowa"
 }
+
+variable "region" {
+  default = "eu-central-1"
+}
 # variable "waf_name" {
 #   default = "waf-fargate"
 # }

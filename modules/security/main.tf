@@ -52,21 +52,21 @@ resource "aws_security_group" "efs_security_group" {
 }
 resource "aws_security_group_rule" "efs_ingress" {
 
-  security_group_id        = aws_security_group.efs_security_group.id
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = -1
-  cidr_blocks = ["0.0.0.0/0"]
-  description              = "Ingress to EFS mount from ghost container"
+  security_group_id = aws_security_group.efs_security_group.id
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = -1
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Ingress to EFS mount from ghost container"
 }
 
 
 resource "aws_security_group_rule" "efs_egress" {
-  security_group_id        = aws_security_group.efs_security_group.id
-  type                     = "egress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = -1
-  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.efs_security_group.id
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = -1
+  cidr_blocks       = ["0.0.0.0/0"]
 }

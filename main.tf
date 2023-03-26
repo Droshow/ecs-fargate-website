@@ -1,29 +1,29 @@
 locals {
 
-    project_name = "ecs-fargate-ghost"
-    name_context = "${local.project_name}-${terraform.workspace}"
-    name = "${local.project_name}-${terraform.workspace}"
+  project_name = "ecs-fargate-ghost"
+  name_context = "${local.project_name}-${terraform.workspace}"
+  name         = "${local.project_name}-${terraform.workspace}"
 
-    global_tag = {
-        Billing     = "Billing Account 01"
-    }
+  global_tag = {
+    Billing = "Billing Account 01"
+  }
 
-    project_tag = {
-        Environment = terraform.workspace
-        Project     = local.project_name
-    }
+  project_tag = {
+    Environment = terraform.workspace
+    Project     = local.project_name
+  }
 
-    tags  = merge(local.global_tag,local.project_tag)
+  tags = merge(local.global_tag, local.project_tag)
 
-    region = "eu-central-1"
+  region = "eu-central-1"
 
 }
 ################
 #SECURITY GROUPS
 ################
 module "security" {
-  source = "./modules/security"
-  vpc_id = module.vpc.vpc_id
+  source    = "./modules/security"
+  vpc_id    = module.vpc.vpc_id
   site_name = var.site_name
 
 }
@@ -38,18 +38,18 @@ module "vpc" {
   name = local.project_tag.Project
   cidr = "10.0.0.0/16"
 
-  azs             = ["eu-central-1a", "eu-central-1b",]
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24",]
-  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24",]
+  azs             = ["eu-central-1a", "eu-central-1b", ]
+  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", ]
+  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", ]
 
-  enable_nat_gateway = true
+  enable_nat_gateway = false
   enable_vpn_gateway = false
 
   enable_dns_hostnames = true
   enable_dns_support   = true
 
   tags = {
-    Terraform = "true"
+    Terraform   = "true"
     Environment = local.project_tag.Environment
   }
 }
@@ -62,6 +62,7 @@ module "vpc" {
 module "ecs" {
   source                                    = "./modules/ecs"
   cluster_count                             = 1
+  region                                    = var.region
   site_name                                 = var.site_name
   cluster_name                              = var.cluster_name
   capacity_provider                         = var.capacity_provider
@@ -72,6 +73,7 @@ module "ecs" {
   execution_role_arn                        = module.iam.iam_role
   task_role_arn                             = module.iam.iam_role
   subnets                                   = module.vpc.private_subnets
+  vpc_id                                    = module.vpc.vpc_id
   lb_target_group_arn                       = module.loadbalancer.lb_target_group_arn
   cpu                                       = 256
   memory                                    = 512
@@ -81,8 +83,8 @@ module "ecs" {
   default_capacity_provider_strategy_base   = 1
   default_capacity_provider_strategy_weight = 100
   container_definitions_essential           = true
-  sg-container				    = module.security.fargate_task
-  ecs_subnet_id				    = module.security.fargate_task
+  sg-container                              = module.security.fargate_task
+  ecs_subnet_id                             = module.security.fargate_task
 
   depends_on = [module.vpc]
 }
@@ -136,5 +138,14 @@ module "iam" {
   assume_role_policy     = file("./fargate-trusted-identity.json")
 
 }
+#############
+#Cloudfront
+#############
+module "cloudfront" {
+  source            = "./modules/cloudfront"
+  distribution_name = "${var.site_name}-distribution"
+  site_name         = var.site_name
+  alb_domain        = module.loadbalancer.lb_endpoint
 
+}
 

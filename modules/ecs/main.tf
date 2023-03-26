@@ -51,10 +51,10 @@ resource "aws_ecs_task_definition" "os_system" {
           hostPort      = var.host_port
         }
       ],
-      mountPoints =  [
+      mountPoints = [
         {
-          sourceVolume = "${var.site_name}_ghost_persistent",
-          containerPath =  "/var/lib/ghost/content"
+          sourceVolume  = "${var.site_name}_ghost_persistent",
+          containerPath = "/var/lib/ghost/content"
         }
       ]
 
@@ -63,16 +63,16 @@ resource "aws_ecs_task_definition" "os_system" {
   volume {
     name = "${var.site_name}_ghost_persistent"
 
-     efs_volume_configuration {
-      file_system_id          = aws_efs_file_system.ghost_persistent.id
-      root_directory          = ""
-      transit_encryption      = "DISABLED"
-    authorization_config {
- #       access_point_id = aws_efs_access_point.ghost_efs.id
-       iam             = "DISABLED"
+    efs_volume_configuration {
+      file_system_id     = aws_efs_file_system.ghost_persistent.id
+      root_directory     = ""
+      transit_encryption = "DISABLED"
+      authorization_config {
+        #       access_point_id = aws_efs_access_point.ghost_efs.id
+        iam = "DISABLED"
       }
     }
-        }
+  }
 }
 resource "aws_ecs_service" "os_system" {
   name            = var.cluster_name
@@ -90,9 +90,9 @@ resource "aws_ecs_service" "os_system" {
 
   }
   network_configuration {
-    subnets          = var.subnets
+    subnets = var.subnets
     #assign_public_ip = var.assign_public_ip
-    security_groups = [ var.sg-container ]
+    security_groups = [var.sg-container]
   }
 }
 
@@ -113,9 +113,36 @@ resource "aws_efs_access_point" "ghost_efs" {
   file_system_id = aws_efs_file_system.ghost_persistent.id
 }
 
-resource "aws_efs_mount_target" "ghost_efs" {
-  for_each        = toset(var.subnets)
-  file_system_id  = aws_efs_file_system.ghost_persistent.id
-  subnet_id = each.value
-  security_groups = [ var.ecs_subnet_id]
+resource "aws_security_group" "efs_sg" {
+  name        = "efs-sg"
+  description = "Allow EFS access"
+  vpc_id      = var.vpc_id
 }
+
+resource "aws_efs_mount_target" "ghost_efs" {
+  count           = length(var.subnets)
+  file_system_id  = aws_efs_file_system.ghost_persistent.id
+  subnet_id       = var.subnets[count.index]
+  security_groups = [aws_security_group.efs_sg.id]
+}
+
+#########
+# VPC Endpoint
+#########
+
+# Create the VPC endpoint for EFS
+# resource "aws_vpc_endpoint" "efs" {
+#   vpc_id              = module.vpc.id
+#   service_name        = "com.amazonaws.${var.region}.elasticfilesystem"
+#   vpc_endpoint_type   = "Interface"
+#   security_group_ids  = [aws_security_group.fargate.id]
+#   subnet_ids          = module.subnets.ids
+# }
+
+# # Create the VPC endpoint for CloudFront
+# resource "aws_vpc_endpoint" "ecs" {
+#   vpc_id       = var.vpc_id
+#   service_name = "com.amazonaws.${var.region}.cloudfront"
+#   vpc_endpoint_type = "Interface"
+#   subnet_ids = var.subnets
+# }
