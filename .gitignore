@@ -6,3 +6,4 @@
 .terraform.lock.hcl
 .DS_Store
 .git/
+.terraform.plan

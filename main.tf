@@ -75,6 +75,7 @@ module "ecs" {
   subnets                                   = module.vpc.private_subnets
   vpc_id                                    = module.vpc.vpc_id
   lb_target_group_arn                       = module.loadbalancer.lb_target_group_arn
+  efs_sg                                    = module.security.efs_sg
   cpu                                       = 256
   memory                                    = 512
   container_port                            = 2368

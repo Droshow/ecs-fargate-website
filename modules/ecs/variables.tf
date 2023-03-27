@@ -23,6 +23,7 @@ variable "ecs_subnet_id" {}
 variable "sg-container" {}
 variable "vpc_id" {}
 variable "region" {}
+variable "efs_sg" {}
 # variable "site_domain" {
 #   type        = string
 #   description = "The site domain name to configure (without any subdomains such as 'www')"

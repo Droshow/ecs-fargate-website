@@ -113,17 +113,11 @@ resource "aws_efs_access_point" "ghost_efs" {
   file_system_id = aws_efs_file_system.ghost_persistent.id
 }
 
-resource "aws_security_group" "efs_sg" {
-  name        = "efs-sg"
-  description = "Allow EFS access"
-  vpc_id      = var.vpc_id
-}
-
 resource "aws_efs_mount_target" "ghost_efs" {
   count           = length(var.subnets)
   file_system_id  = aws_efs_file_system.ghost_persistent.id
   subnet_id       = var.subnets[count.index]
-  security_groups = [aws_security_group.efs_sg.id]
+  security_groups = [var.efs_sg]
 }
 
 #########

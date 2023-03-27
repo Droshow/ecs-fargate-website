@@ -5,3 +5,6 @@ output "fargate_task" {
 output "fargate_sg_default" {
   value = aws_default_security_group.fargate_default.id
 }
+output "efs_sg" {
+  value = aws_security_group.efs_security_group.id
+}
