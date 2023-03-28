@@ -147,6 +147,7 @@ module "cloudfront" {
   distribution_name = "${var.site_name}-distribution"
   site_name         = var.site_name
   alb_domain        = module.loadbalancer.lb_endpoint
-
+  dns_domain        = var.dns_domain
+  dns_record        = var.dns_record
 }
 

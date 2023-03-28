@@ -1,8 +1,5 @@
-# variable "dns_domain" {
-# }
-# variable "dns_record" {
-
-# }
+variable "dns_domain" {}
+variable "dns_record" {}
 # variable "cf_dns" {
 # }
 # variable "cert_arn" {

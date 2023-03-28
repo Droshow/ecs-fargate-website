@@ -9,6 +9,12 @@ variable "container_image" {
 variable "cluster_name" {
   default = "ghost"
 }
+variable "dns_record" {
+  default = "www.mybackstage.io"
+}
+variable "dns_domain" {
+  default = "mybackstage.io"
+}
 variable "capacity_provider" {
   default = "FARGATE"
 }

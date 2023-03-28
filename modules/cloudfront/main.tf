@@ -1,6 +1,10 @@
 #########
 #S3
 #########
+provider "aws" {
+  alias  = "us_east_1"
+  region = "us-east-1"
+}
 
 resource "aws_s3_bucket" "static_content" {
   bucket = "static-content-${var.site_name}"
@@ -107,21 +111,46 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     }
   }
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn = aws_acm_certificate.cloudfront_certificate.arn
+    ssl_support_method   = "sni-only"
   }
 }
 
 # ROUTE53
-# data "aws_route53_zone" "main" {
-#   name = var.dns_domain
+data "aws_route53_zone" "main" {
+  name = var.dns_domain
+}
+resource "aws_route53_record" "www" {
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = var.dns_record
+  type    = "A"
+  alias {
+    name                   = aws_cloudfront_distribution.s3_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+# ACM
+resource "aws_acm_certificate" "cloudfront_certificate" {
+  domain_name = "*.${var.dns_domain}"
+  validation_method = "DNS"
+  tags = {
+    Name = "CloudFront Certificate"
+  }
+  provider = aws.us_east_1
+}
+
+# resource "aws_acm_certificate" "copy" {
+#   certificate_arn = data.aws_acm_certificate.cloudfront_certificate.arn
+#   region          = "us-east-1"
 # }
-# resource "aws_route53_record" "www" {
-#   zone_id = data.aws_route53_zone.main.zone_id
-#   name    = var.dns_record
-#   type    = "A"
-#   alias {
-#     name                   = aws_cloudfront_distribution.s3_distribution.domain_name
-#     zone_id                = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
-#     evaluate_target_health = false
-#   }
-# }
+
+resource "aws_route53_record" "acm_validation" {
+  count   = length(aws_acm_certificate.cloudfront_certificate.domain_validation_options)
+  name    = element(aws_acm_certificate.cloudfront_certificate.domain_validation_options.*.resource_record_name, count.index)
+  type    = element(aws_acm_certificate.cloudfront_certificate.domain_validation_options.*.resource_record_type, count.index)
+  zone_id = data.aws_route53_zone.main.zone_id
+  records = [element(aws_acm_certificate.cloudfront_certificate.domain_validation_options.*.resource_record_value, count.index)]
+  ttl     = 60
+}
