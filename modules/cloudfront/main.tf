@@ -61,7 +61,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
       origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
-  
+
 
   enabled         = true
   is_ipv6_enabled = true
