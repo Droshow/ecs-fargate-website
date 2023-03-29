@@ -40,6 +40,7 @@ resource "aws_s3_bucket_policy" "static_content" {
 #   s3_origin_id = var.tag
 # }
 resource "aws_cloudfront_distribution" "s3_distribution" {
+  aliases = ["*.${var.dns_domain}", "${var.dns_domain}"]
   origin {
     domain_name = aws_s3_bucket.static_content.bucket_regional_domain_name
     origin_id   = "S3_static_content"
@@ -47,7 +48,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.s3_oai.cloudfront_access_identity_path
     }
-    # origin_path = "/static/*"
+    origin_path = "/static/*"
   }
 
   origin {
@@ -86,7 +87,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   ordered_cache_behavior {
-    path_pattern     = "/dynamic/*"
+    path_pattern     = "/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
     target_origin_id = "ALB_dynamic_content"
@@ -111,7 +112,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     }
   }
   viewer_certificate {
-    acm_certificate_arn = aws_acm_certificate.cloudfront_certificate.arn
+    acm_certificate_arn = data.aws_acm_certificate.dns_domain.arn
     ssl_support_method   = "sni-only"
   }
 }
@@ -132,25 +133,39 @@ resource "aws_route53_record" "www" {
 }
 
 # ACM
-resource "aws_acm_certificate" "cloudfront_certificate" {
-  domain_name = "*.${var.dns_domain}"
-  validation_method = "DNS"
-  tags = {
-    Name = "CloudFront Certificate"
-  }
+data "aws_acm_certificate" "dns_domain" {
+  domain   = "${var.dns_domain}"
+  statuses = ["ISSUED"]
   provider = aws.us_east_1
 }
 
-# resource "aws_acm_certificate" "copy" {
-#   certificate_arn = data.aws_acm_certificate.cloudfront_certificate.arn
-#   region          = "us-east-1"
+# resource "aws_acm_certificate" "cloudfront_certificate" {
+#   domain_name       = "${var.dns_domain}"
+#   validation_method = "DNS"
+#   tags = {
+#     Name = "CloudFront Certificate"
+#   }
+#   provider = aws.us_east_1
+
+#   subject_alternative_names = ["www.${var.dns_domain}"]
+
+#   lifecycle {
+#     create_before_destroy = true
+#   }
 # }
 
-resource "aws_route53_record" "acm_validation" {
-  count   = length(aws_acm_certificate.cloudfront_certificate.domain_validation_options)
-  name    = element(aws_acm_certificate.cloudfront_certificate.domain_validation_options.*.resource_record_name, count.index)
-  type    = element(aws_acm_certificate.cloudfront_certificate.domain_validation_options.*.resource_record_type, count.index)
-  zone_id = data.aws_route53_zone.main.zone_id
-  records = [element(aws_acm_certificate.cloudfront_certificate.domain_validation_options.*.resource_record_value, count.index)]
-  ttl     = 60
-}
+
+# resource "aws_route53_record" "acm_validation" {
+#   for_each = {
+#     for dvo in aws_acm_certificate.cloudfront_certificate.domain_validation_options : dvo.domain_name => dvo
+#   }
+
+#   name    = each.value.resource_record_name
+#   type    = each.value.resource_record_type
+#   zone_id = data.aws_route53_zone.main.zone_id
+#   records = [each.value.resource_record_value]
+#   ttl     = 60
+
+#   depends_on = [aws_acm_certificate.cloudfront_certificate]
+# }
+
