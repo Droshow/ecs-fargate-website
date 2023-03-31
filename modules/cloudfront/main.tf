@@ -62,7 +62,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
       origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
-  
+
 
   enabled         = true
   is_ipv6_enabled = true
@@ -71,7 +71,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3_static_content"
+    target_origin_id = "ALB_dynamic_content"
 
     forwarded_values {
       query_string = false
@@ -90,7 +90,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     path_pattern     = "/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = "ALB_dynamic_content"
+    target_origin_id = "S3_static_content"
 
     forwarded_values {
       query_string = true
@@ -113,7 +113,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
   viewer_certificate {
     acm_certificate_arn = data.aws_acm_certificate.dns_domain.arn
-    ssl_support_method   = "sni-only"
+    ssl_support_method  = "sni-only"
   }
 }
 
@@ -134,9 +134,11 @@ resource "aws_route53_record" "www" {
 
 # ACM
 data "aws_acm_certificate" "dns_domain" {
-  domain   = "${var.dns_domain}"
-  statuses = ["ISSUED"]
-  provider = aws.us_east_1
+  domain      = var.dns_domain
+  statuses    = ["ISSUED"]
+  provider    = aws.us_east_1
+  most_recent = true
+  key_types   = ["RSA_4096"]
 }
 
 # resource "aws_acm_certificate" "cloudfront_certificate" {
