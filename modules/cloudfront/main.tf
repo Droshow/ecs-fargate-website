@@ -58,8 +58,13 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "https-only"
+      origin_protocol_policy = "http-only"
       origin_ssl_protocols   = ["TLSv1.2"]
+    }
+
+    custom_header {
+      name  = "X-CloudFront-Access"
+      value = "This-is-martins-special-header"
     }
   }
 
@@ -87,16 +92,16 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   ordered_cache_behavior {
-    path_pattern     = "/*"
+    path_pattern     = "/static/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
     target_origin_id = "S3_static_content"
 
     forwarded_values {
       query_string = true
-      headers      = ["*"]
+      headers      = ["Origin", "Access-Control-Request-Headers", "Access-Control-Request-Method"]
       cookies {
-        forward = "all"
+        forward = "none"
       }
     }
 
@@ -113,7 +118,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
   viewer_certificate {
     acm_certificate_arn = data.aws_acm_certificate.dns_domain.arn
-    ssl_support_method  = "sni-only"
+    #acm_certificate_arn = aws_acm_certificate.cloudfront_certificate.arn
+    ssl_support_method = "sni-only"
   }
 }
 
@@ -132,13 +138,23 @@ resource "aws_route53_record" "www" {
   }
 }
 
+resource "aws_route53_record" "domain" {
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = var.dns_domain
+  type    = "A"
+  alias {
+    name                   = aws_cloudfront_distribution.s3_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.s3_distribution.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
 # ACM
 data "aws_acm_certificate" "dns_domain" {
-  domain      = var.dns_domain
-  statuses    = ["ISSUED"]
+  domain = var.dns_domain
+  #statuses    = ["ISSUED"]
   provider    = aws.us_east_1
   most_recent = true
-  key_types   = ["RSA_4096"]
 }
 
 # resource "aws_acm_certificate" "cloudfront_certificate" {
@@ -149,7 +165,7 @@ data "aws_acm_certificate" "dns_domain" {
 #   }
 #   provider = aws.us_east_1
 
-#   subject_alternative_names = ["www.${var.dns_domain}"]
+#   subject_alternative_names = ["*.${var.dns_domain}"]
 
 #   lifecycle {
 #     create_before_destroy = true
